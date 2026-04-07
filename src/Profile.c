@@ -33,7 +33,7 @@ bool Profile__read(struct Profile* self, char filename[]) {
     for (size_t i=0; i < LINELENGTH; i++) {
       assert(i < LINELENGTH);
 
-      char c = fgetc(file_descriptor);
+      int c = fgetc(file_descriptor);
 
       bool stop = false;
       switch (c) {
@@ -41,13 +41,14 @@ bool Profile__read(struct Profile* self, char filename[]) {
           line[i] = '\0';
           done = true;
           stop = true;
+          break;
         case '\n':
           line[i] = '\0';
           i=0;
           stop = true;
           break;
         default:
-          line[i] = c;
+          line[i] = (char)c;
       }
 
       if (stop) {
@@ -75,6 +76,9 @@ bool Profile__read(struct Profile* self, char filename[]) {
       if (lineno == 0) {
         // In a profile, num_literals of each emission_table will be const 1.
         keys[i] = Literal__from_char(token[0]);
+        if (i >= 4) {
+          die("Too many columns in the header ");
+        }
 
         token = strtok(NULL, DELIMITERS);
         i++;
